@@ -8,37 +8,11 @@ Recovery hacking effort for the purposes of Pris project
 - Python
 
 
-## Pulling the image (if necessary)
+## Editing the image
 
-Run as root on the device:
+Project root is in `tools/Android_boot_image_editor/build/unzip_boot/`.
 
-```
-dd if=/dev/block/bootdevice/by-name/recovery of=/sdcard/recovery.img bs=2048
-```
-
-Then run on the PC:
-
-```
-adb pull /sdcard/recovery.img stock-v13/recovery.img
-```
-
-
-## Extracting the image
-
-```
-cp stock-v13/recovery.img tools/Android_boot_image_editor/
-cd tools/Android_boot_image_editor/
-./gradlew unpack
-```
-
-A directory named `tools/Android_boot_image_editor/build/unzip_boot` will be created:
-
-```
-$ ls build/unzip_boot/
-bootimg.json	kernel		ramdisk.img	ramdisk.img.gz	root
-```
-
-## Recompiling the image
+## Ccompiling the image
 
 ```
 cd tools/Android_boot_image_editor/
@@ -69,3 +43,8 @@ To restore, mount the partitions and run:
 dd if=/sdcard/recovery-backup.img of=/dev/block/bootdevice/by-name/recovery bs=2048
 ```
 
+## Signing the packages with the image keys
+
+```
+tools/stockerize/stockerize.sh package_root package.zip
+```

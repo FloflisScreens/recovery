@@ -1,0 +1,41 @@
+{
+  "info" : {
+    "output" : "recovery.img",
+    "headerVersion" : 0,
+    "headerSize" : 0,
+    "loadBase" : "0x0",
+    "tagsOffset" : "0x80000100",
+    "board" : null,
+    "pageSize" : 2048,
+    "cmdline" : "console=ttyHSL0,115200,n8 androidboot.console=ttyHSL0 androidboot.hardware=qcom msm_rtb.filter=0x237 ehci-hcd.park=3 androidboot.bootdevice=7824900.sdhci lpm_levels.sleep_disabled=1 earlyprintk androidboot.selinux=permissive",
+    "osVersion" : null,
+    "osPatchLevel" : null,
+    "hash" : "1200a57a6d283362161b2f4c19b4578f4fbfce4a000000000000000000000000",
+    "verify" : "VERIFY"
+  },
+  "kernel" : {
+    "file" : "build/unzip_boot/kernel",
+    "position" : "0x800",
+    "size" : "0xd6f07a",
+    "loadOffset" : "0x80008000"
+  },
+  "ramdisk" : {
+    "file" : "build/unzip_boot/ramdisk.img.gz",
+    "position" : "0xd70000",
+    "size" : "0x1c6c2c",
+    "loadOffset" : "0x81000000"
+  },
+  "secondBootloader" : {
+    "file" : null,
+    "position" : "0xf37000",
+    "size" : "0x0",
+    "loadOffset" : "0x80f00000"
+  },
+  "signature" : {
+    "type" : "dm-verity",
+    "path" : "/boot",
+    "verity_pk8" : "security/verity.pk8",
+    "verity_pem" : "security/verity.x509.pem",
+    "jarPath" : "boot_signer/build/libs/boot_signer.jar"
+  }
+}
