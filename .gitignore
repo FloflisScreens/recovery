@@ -1,0 +1,10 @@
+build/
+tools/imgtool/imgtool
+tools/Android_boot_image_editor/.gradle
+tools/Android_boot_image_editor/.git
+tools/Android_boot_image_editor/.idea
+tools/Android_boot_image_editor/boot.img
+tools/Android_boot_image_editor/recovery.img
+tools/Android_boot_image_editor/build/unzip_boot
+works/*
+.DS_Store
