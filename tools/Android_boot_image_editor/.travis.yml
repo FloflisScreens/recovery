@@ -1,0 +1,11 @@
+dist: trusty
+language: java
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libblkid-dev
+
+script:
+  - ./gradlew check
+  - ./gradlew _setup
+  - ./gradlew unpack
+  - ./gradlew pack

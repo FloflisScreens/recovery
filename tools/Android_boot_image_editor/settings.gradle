@@ -1,0 +1,3 @@
+include 'boot_signer'
+include 'mkbootfs'
+include 'bbootimg'

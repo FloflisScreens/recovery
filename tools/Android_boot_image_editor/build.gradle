@@ -1,0 +1,179 @@
+apply plugin: 'java'
+
+apply plugin: 'groovy'
+
+subprojects {
+    tasks.withType(JavaCompile) {
+        //options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }
+}
+
+// ----------------------------------------------------------------------------
+//                       global
+// ----------------------------------------------------------------------------
+def workdir = 'build/unzip_boot'
+project.ext.rootWorkDir = new File(workdir).getAbsolutePath()
+String activeImg = "boot.img"
+String activePath = "/boot"
+if (new File("boot.img").exists()) {
+    activeImg = "boot.img"
+    activePath = "/boot"
+} else if (new File("recovery.img").exists()) {
+    activeImg = "recovery.img"
+    activePath = "/recovery"
+} else if (new File("recovery-two-step.img").exists()) {
+    activeImg = "recovery-two-step.img"
+    activePath = "/boot"
+} else if (new File("vbmeta.img").exists()) {
+    activeImg = "vbmeta.img"
+    activePath = "/vbmeta"
+}
+project.ext.outClearIMg = new File(String.format("%s.clear", activeImg)).getAbsolutePath()
+project.ext.mkbootimgBin = new File("src/mkbootimg/mkbootimg").getAbsolutePath()
+project.ext.mkbootfsBin = new File("mkbootfs/build/exe/mkbootfs/mkbootfs").getAbsolutePath()
+project.ext.avbtool = new File("avb/avbtool").getAbsolutePath()
+project.ext.bootSigner = new File("boot_signer/build/libs/boot_signer.jar").getAbsolutePath()
+println("Active image target: " + activeImg)
+
+// ----------------------------------------------------------------------------
+//                       tasks
+// ----------------------------------------------------------------------------
+task unpack(type: JavaExec, dependsOn: ["bbootimg:jar"]) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = "cfig.RKt"
+    classpath = files("bbootimg/build/libs/bbootimg.jar")
+    maxHeapSize '512m'
+    args "unpack", activeImg, rootProject.mkbootimgBin, rootProject.avbtool, rootProject.bootSigner, rootProject.mkbootfsBin
+}
+
+task packClear(type: JavaExec, dependsOn: ["bbootimg:jar", "mkbootfs:mkbootfsExecutable"]) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = "cfig.RKt"
+    classpath = files("bbootimg/build/libs/bbootimg.jar")
+    maxHeapSize '512m'
+    args "pack", activeImg, rootProject.mkbootimgBin, rootProject.avbtool, rootProject.bootSigner, rootProject.mkbootfsBin
+}
+
+task sign(type: JavaExec, dependsOn: ["bbootimg:jar", packClear, "boot_signer:jar"]) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = "cfig.RKt"
+    classpath = files("bbootimg/build/libs/bbootimg.jar")
+    maxHeapSize '512m'
+    args "sign", activeImg, rootProject.mkbootimgBin, rootProject.avbtool, rootProject.bootSigner, rootProject.mkbootfsBin
+}
+
+task signTest(type: JavaExec, dependsOn: ["boot_signer:jar"]) {
+    main = 'com.android.verity.BootSignature'
+    classpath = files("boot_signer/build/libs/boot_signer.jar")
+    maxHeapSize '512m'
+    args activePath, activeImg + '.clear', 'security/verity.pk8', 'security/verity.x509.pem', activeImg + '.signed', rootProject.mkbootfsBin
+}
+
+task pack(dependsOn: sign) {
+    doLast {
+        println("Pack task finished: " + activeImg + ".signed")
+    }
+}
+
+task _setup(type: Copy) {
+    from 'src/test/resources/boot.img'
+    into '.'
+}
+
+task pull() {
+    doFirst {
+        println("Pulling ...")
+    }
+
+    doLast {
+        if (project.findProperty("group")) {
+            println("Pull: $group")
+        } else {
+            println("Pull /boot, /recovery, /vbmeta")
+            pullDefault()
+        }
+    }
+}
+
+void pullDefault() {
+    Run(["adb", "shell", "dd if=/dev/block/by-name/boot of=/cache/boot.img"])
+    Run(["adb", "shell", "dd if=/dev/block/by-name/recovery of=/cache/recovery.img"])
+    Run(["adb", "shell", "dd if=/dev/block/by-name/vbmeta of=/cache/vbmeta.img"])
+
+    Run(["adb", "pull", "/cache/boot.img"])
+    Run(["adb", "pull", "/cache/recovery.img"])
+    Run(["adb", "pull", "/cache/vbmeta.img"])
+
+    Run(["adb", "shell", "rm /cache/boot.img"])
+    Run(["adb", "shell", "rm /cache/recovery.img"])
+    Run(["adb", "shell", "rm /cache/vbmeta.img"])
+}
+
+void Run(List<String> inCmd, String inWorkdir = null) {
+    println("CMD:" + inCmd)
+    if (inWorkdir == null) {
+        inWorkdir = ".";
+    }
+    ProcessBuilder pb = new ProcessBuilder(inCmd)
+            .directory(new File(inWorkdir))
+            .redirectErrorStream(true);
+    Process p = pb.start()
+    p.inputStream.eachLine { println it }
+    p.waitFor();
+    assert 0 == p.exitValue()
+}
+
+void Run(String inCmd, String inWorkdir = null) {
+    Run(Arrays.asList(inCmd.split()), inWorkdir);
+}
+
+void updateBootImage(String activeImg) {
+    String flashTarget = null;
+    switch (activeImg) {
+        case "boot.img":
+        case "recovery-two-step.img":
+            flashTarget = "/dev/block/by-name/boot";
+            break;
+        case "recovery.img":
+            flashTarget = "/dev/block/by-name/recovery";
+            break;
+        case "vbmeta.img":
+            flashTarget = "/dev/block/by-name/vbmeta";
+            if (!new File(activeImg + ".signed").exists()) {
+                return;
+            }
+            break;
+    }
+    Run("adb root")
+    Run("adb push " + activeImg + ".signed /cache/")
+    List<String> cmd2 = ["adb", "shell", "dd if=/cache/" + activeImg + ".signed of=" + flashTarget]
+    Run(cmd2)
+    cmd2 = ["adb", "shell", "rm -f /cache/" + activeImg + ".signed"];
+    Run(cmd2)
+}
+
+task flash {
+    doLast {
+        updateBootImage(activeImg)
+        updateBootImage("vbmeta.img")
+    }
+}
+
+void rebootRecovery() {
+    Run("adb reboot recovery")
+}
+
+task rr {
+    doLast {
+        rebootRecovery()
+    }
+}
+
+boolean inArray(String file, String[] inArray) {
+    for (String item : inArray) {
+        if (item.equals(file)) {
+            return true;
+        }
+    }
+    return false;
+}
