@@ -8,6 +8,7 @@ tools/Android_boot_image_editor/recovery.img
 tools/Android_boot_image_editor/recovery.img.clear
 tools/Android_boot_image_editor/recovery.img.google
 tools/Android_boot_image_editor/build/unzip_boot/
+src/root/system/bin/
 recovery.new.img
 works/*
 .DS_Store
