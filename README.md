@@ -10,16 +10,15 @@ Recovery hacking effort for the purposes of Pris project
 
 ## Editing the image
 
-Project root is in `tools/Android_boot_image_editor/build/unzip_boot/`.
+Project root is in the `src` directory.
 
-## Ccompiling the image
+## Compiling the image
 
 ```
-cd tools/Android_boot_image_editor/
-./gradlew pack
+./build.sh
 ```
 
-A file named `tools/Android_boot_image_editor/recovery.img.signed` will be created.
+A file named `recovery.new.img` will be created.
 
 
 ## Flashing the image
@@ -27,7 +26,7 @@ A file named `tools/Android_boot_image_editor/recovery.img.signed` will be creat
 First run on the PC:
 
 ```
-adb push tools/Android_boot_image_editor/recovery.img.signed /sdcard/recovery.img
+adb push recovery.new.img /sdcard/recovery.img
 ```
 
 Then run as root on the device:
@@ -43,8 +42,10 @@ To restore, mount the partitions and run:
 dd if=/sdcard/recovery-backup.img of=/dev/block/bootdevice/by-name/recovery bs=2048
 ```
 
-## Signing the packages with the image keys
+## Signing the update packages / patches with the image keys
 
 ```
 tools/stockerize/stockerize.sh package_root package.zip
 ```
+
+The zips will be packed and signed with the same keys recovery was generated with.
