@@ -23,24 +23,22 @@ A file named `recovery.new.img` will be created.
 
 ## Flashing the image
 
-First run on the PC:
+Acquire ADB root on the device and then run on the PC from the working directory (needs Bash):
 
 ```
-adb push recovery.new.img /sdcard/recovery.img
-```
-
-Then run as root on the device:
-
-```
-dd if=/dev/block/bootdevice/by-name/recovery of=/sdcard/recovery-backup.img bs=2048
-dd if=/sdcard/recovery.img of=/dev/block/bootdevice/by-name/recovery bs=2048
+./update-and-test.sh
 ```
 
 To restore, mount the partitions and run:
 
 ```
-dd if=/sdcard/recovery-backup.img of=/dev/block/bootdevice/by-name/recovery bs=2048
+dd if=/sdcard/recovery.backup.$ID.img of=/dev/block/bootdevice/by-name/recovery bs=2048
 ```
+
+## Getting to the root shell in the recovery mode
+
+The patched recovery includes Busybox-based root shell. To use it, run `adb shell sh`.
+
 
 ## Signing the update packages / patches with the image keys
 
