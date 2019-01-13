@@ -4,7 +4,9 @@ Recovery hacking effort for the purposes of Pris project
 
 ## Dependencies
 
-- JRE (for Gradle)
+- ADB
+- Bash
+- JDK 8 (for Gradle)
 - Python
 
 
@@ -15,7 +17,7 @@ Project root is in the `src` directory.
 ## Compiling the image
 
 ```
-./build.sh
+make build
 ```
 
 A file named `recovery.new.img` will be created.
@@ -26,18 +28,21 @@ A file named `recovery.new.img` will be created.
 Acquire ADB root on the device and then run on the PC from the working directory (needs Bash):
 
 ```
-./update-and-test.sh
+make backup
+make deploy
+adb reboot recovery
 ```
 
 To restore, mount the partitions and run:
 
 ```
-dd if=/sdcard/recovery.backup.$ID.img of=/dev/block/bootdevice/by-name/recovery bs=2048
+mv works/backups/recovery.$RANDOMID.img ./recovery.new.img
+adb deploy
 ```
 
 ## Getting to the root shell in the recovery mode
 
-The patched recovery includes Busybox-based root shell. To use it, run `adb shell sh`.
+The patched recovery includes Busybox-based root shell. To use it, run `adb shell`.
 
 
 ## Signing the update packages / patches with the image keys
