@@ -24,8 +24,7 @@ clean: clean-recovery
 # Recovery image part
 
 pre-build-recovery: clean-recovery
-	mkdir -p ./src/${TARGET}/root/system/bin
-	$(shell for util in $$(<./bbutils.txt); do ln -s /sbin/busybox ./src/${TARGET}/root/system/bin/$$util; done)
+	$(shell mkdir -p src/${TARGET}/root/system/bin; for util in $$(<bbutils.txt); do ln -sf /sbin/busybox src/${TARGET}/root/system/bin/$$util; done)
 	chmod -R 777 ./src/${TARGET}/root/system/bin/
 	mkdir -p ./tools/Android_boot_image_editor/build/unzip_boot/
 	cp -R ./src/${TARGET}/* ./tools/Android_boot_image_editor/build/unzip_boot/
