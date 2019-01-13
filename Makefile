@@ -7,7 +7,7 @@ INTERNALDEVICE = '/dev/block/bootdevice/by-name/userdata'
 SHELL = '/bin/bash'
 BUILDID = $(shell bash -c 'echo $$RANDOM')
 
-TARGET = '8110'
+TARGET = 8110
 
 # Common tasks
 
