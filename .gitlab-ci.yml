@@ -10,6 +10,7 @@ Build System:
     # Run build for recovery
     # reserved for future:
     #- make build-installer
+    - cd $CI_PROJECT_DIR
     - make build
     - mkdir ./artifacts
     #- mv ./pris-recovery-install.zip ./artifacts/pris-recovery-install.zip
