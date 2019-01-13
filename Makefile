@@ -28,7 +28,7 @@ pre-build-recovery: clean-recovery
 	for util in $$(<./bbutils.txt); do \
 	  ln -s /sbin/busybox ./src/${TARGET}/root/system/bin/$$util;\
 	done
-	chmod 0777 ./src/${TARGET}/root/system/bin/*
+	chmod -R 777 ./src/${TARGET}/root/system/bin/
 	mkdir -p ./tools/Android_boot_image_editor/build/unzip_boot/
 	cp -R ./src/${TARGET}/* ./tools/Android_boot_image_editor/build/unzip_boot/
 
