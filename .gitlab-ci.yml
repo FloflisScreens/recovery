@@ -13,7 +13,7 @@ Build System:
     - make build
     - mkdir ./artifacts
     #- mv ./pris-recovery-install.zip ./artifacts/pris-recovery-install.zip
-    - mv ./recovery.new.img ./artifacts/recovery.img
+    - mv ./recovery-8110.img ./artifacts/recovery-8110.img
     - make clean
   artifacts:
     when: on_success

@@ -33,8 +33,8 @@ pre-build-recovery: clean-recovery
 	cp -R ./src/${TARGET}/* ./tools/Android_boot_image_editor/build/unzip_boot/
 
 build-recovery: pre-build-recovery
-	cd ./tools/Android_boot_image_editor && ./gradlew pack && mv recovery.img.signed ../../recovery.new.img
-	echo 'Recovery image created at recovery.new.img'
+	cd ./tools/Android_boot_image_editor && ./gradlew pack && mv recovery.img.signed ../../recovery-${TARGET}.img
+	echo 'Recovery image created at recovery-${TARGET}.img'
 
 backup-recovery:
 	adb shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard ${INTERNALDEVICE} /data
@@ -45,7 +45,7 @@ backup-recovery:
 
 deploy-recovery:
 	adb shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard ${INTERNALDEVICE} /data
-	adb push ./recovery.new.img ${PERSISTDIR}/
+	adb push ./recovery-${TARGET}.img ${PERSISTDIR}/recovery.new.img
 	adb shell dd if=${PERSISTDIR}/recovery.new.img of=/dev/block/bootdevice/by-name/recovery bs=2048
 	adb shell rm ${PERSISTDIR}/recovery.new.img
 	echo 'Recovery image deployed'
@@ -53,4 +53,4 @@ deploy-recovery:
 clean-recovery:
 	rm -rf ./tools/Android_boot_image_editor/build/unzip_boot
 	rm -rf ./src/${TARGET}/root/system/bin
-	rm -f ./recovery.new.img
+	rm -f ./recovery-${TARGET}.img

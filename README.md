@@ -20,7 +20,7 @@ Project root is in the `src` directory.
 make build
 ```
 
-A file named `recovery.new.img` will be created.
+A file named `recovery-8110.img` will be created.
 
 
 ## Flashing the image
@@ -36,7 +36,7 @@ adb reboot recovery
 To restore, mount the partitions and run:
 
 ```
-mv works/backups/recovery.$RANDOMID.img ./recovery.new.img
+mv works/backups/recovery.$RANDOMID.img ./recovery-8110.img
 adb deploy
 ```
 
