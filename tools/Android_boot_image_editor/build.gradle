@@ -42,7 +42,7 @@ task unpack(type: JavaExec, dependsOn: ["bbootimg:jar"]) {
     classpath = sourceSets.main.runtimeClasspath
     main = "cfig.RKt"
     classpath = files("bbootimg/build/libs/bbootimg.jar")
-    maxHeapSize '512m'
+    maxHeapSize '2048m'
     args "unpack", activeImg, rootProject.mkbootimgBin, rootProject.avbtool, rootProject.bootSigner, rootProject.mkbootfsBin
 }
 
@@ -50,7 +50,7 @@ task packClear(type: JavaExec, dependsOn: ["bbootimg:jar", "mkbootfs:mkbootfsExe
     classpath = sourceSets.main.runtimeClasspath
     main = "cfig.RKt"
     classpath = files("bbootimg/build/libs/bbootimg.jar")
-    maxHeapSize '512m'
+    maxHeapSize '2048m'
     args "pack", activeImg, rootProject.mkbootimgBin, rootProject.avbtool, rootProject.bootSigner, rootProject.mkbootfsBin
 }
 
@@ -58,14 +58,14 @@ task sign(type: JavaExec, dependsOn: ["bbootimg:jar", packClear, "boot_signer:ja
     classpath = sourceSets.main.runtimeClasspath
     main = "cfig.RKt"
     classpath = files("bbootimg/build/libs/bbootimg.jar")
-    maxHeapSize '512m'
+    maxHeapSize '2048m'
     args "sign", activeImg, rootProject.mkbootimgBin, rootProject.avbtool, rootProject.bootSigner, rootProject.mkbootfsBin
 }
 
 task signTest(type: JavaExec, dependsOn: ["boot_signer:jar"]) {
     main = 'com.android.verity.BootSignature'
     classpath = files("boot_signer/build/libs/boot_signer.jar")
-    maxHeapSize '512m'
+    maxHeapSize '2048m'
     args activePath, activeImg + '.clear', 'security/verity.pk8', 'security/verity.x509.pem', activeImg + '.signed', rootProject.mkbootfsBin
 }
 
